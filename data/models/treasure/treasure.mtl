@@ -1,0 +1,13 @@
+
+newmtl treasure
+Kd 0.4704 0.4704 0.4704
+Ka 0 0 0
+Ks 0 0 0
+Ke 0 0 0
+Ns 1.96078
+illum 2
+map_Ka treasure_chest_occlusion.tga
+map_Kd treasure_chest_albedo.tga
+map_Ks treasure_chest_params.tga
+map_Bump treasure_chest_normal.tga
+

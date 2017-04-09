@@ -1,0 +1,11 @@
+newmtl ogre
+  Ns 0.5000
+  Ni 1.5000
+  d 0.5000
+  illum 2
+  Ka 0.3300 0.3300 0.3300
+  Kd 0.6600 0.6600 0.6600
+  Ks 0.1100 0.1100 0.1100
+  map_Ka ao_gloss.png
+  map_Kd diffuse2.png
+  map_Bump normalmap.png

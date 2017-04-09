@@ -1,0 +1,12 @@
+newmtl dagger
+  Ns 0.5000
+  Ni 1.5000
+  d 0.5000
+  illum 2
+  Ka 0.3300 0.3300 0.3300
+  Kd 0.6600 0.6600 0.6600
+  Ks 0.3300 0.3300 0.3300
+  map_Ka dagger_Gloss.tga
+  map_Kd dagger_Albedo.tga
+  map_Ks dagger_Specular.tga
+  map_Bump dagger_Normals.tga

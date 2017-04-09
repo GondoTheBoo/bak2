@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\common\arcball.cpp">
+      <Filter>cg2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\glsl.cpp">
+      <Filter>cg2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\texture2D.cpp">
+      <Filter>cg2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\triasset.cpp">
+      <Filter>cg2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\settings.cpp">
+      <Filter>cg2</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="cg2">
+      <UniqueIdentifier>{e326f961-5132-4c7b-8f52-cf3c4e6d07fd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\arcball.h">
+      <Filter>cg2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glsl.h">
+      <Filter>cg2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\triasset.h">
+      <Filter>cg2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\texture2D.h">
+      <Filter>cg2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\settings.h">
+      <Filter>cg2</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\bin\shaders\sample_fwd\phongShading.frag" />
+    <None Include="..\..\bin\shaders\sample_fwd\phongShading.vert" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tut_a_window", "tutorial1a\Tutorial1a.vcxproj", "{086E80F7-F000-40F6-BF99-F2957ED9E269}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tut_b_glsl", "tutorial1b\Tutorial1b.vcxproj", "{96B5BD3E-64F5-44B7-9489-01478B28C383}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tut_c_vbos", "tutorial1c\Tutorial1c.vcxproj", "{E9029E58-234C-4EDC-85BF-4D79546A1A9D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tut_d_rendering", "tutorial1d\Tutorial1d.vcxproj", "{9443C25C-8778-480A-9FE0-32FEC70A0FF9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tut_e_rendering_vaos", "tutorial1e\Tutorial1e.vcxproj", "{10B1B430-D157-40FA-8F5F-12135BA7164F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tut_f_matrices", "tutorial1f\Tutorial1f.vcxproj", "{25D4C32A-2231-4309-A41F-3384DCBAFE96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{086E80F7-F000-40F6-BF99-F2957ED9E269}.Debug|x86.ActiveCfg = Debug|Win32
+		{086E80F7-F000-40F6-BF99-F2957ED9E269}.Debug|x86.Build.0 = Debug|Win32
+		{086E80F7-F000-40F6-BF99-F2957ED9E269}.Release|x86.ActiveCfg = Release|Win32
+		{086E80F7-F000-40F6-BF99-F2957ED9E269}.Release|x86.Build.0 = Release|Win32
+		{96B5BD3E-64F5-44B7-9489-01478B28C383}.Debug|x86.ActiveCfg = Debug|Win32
+		{96B5BD3E-64F5-44B7-9489-01478B28C383}.Debug|x86.Build.0 = Debug|Win32
+		{96B5BD3E-64F5-44B7-9489-01478B28C383}.Release|x86.ActiveCfg = Release|Win32
+		{96B5BD3E-64F5-44B7-9489-01478B28C383}.Release|x86.Build.0 = Release|Win32
+		{E9029E58-234C-4EDC-85BF-4D79546A1A9D}.Debug|x86.ActiveCfg = Debug|Win32
+		{E9029E58-234C-4EDC-85BF-4D79546A1A9D}.Debug|x86.Build.0 = Debug|Win32
+		{E9029E58-234C-4EDC-85BF-4D79546A1A9D}.Release|x86.ActiveCfg = Release|Win32
+		{E9029E58-234C-4EDC-85BF-4D79546A1A9D}.Release|x86.Build.0 = Release|Win32
+		{9443C25C-8778-480A-9FE0-32FEC70A0FF9}.Debug|x86.ActiveCfg = Debug|Win32
+		{9443C25C-8778-480A-9FE0-32FEC70A0FF9}.Debug|x86.Build.0 = Debug|Win32
+		{9443C25C-8778-480A-9FE0-32FEC70A0FF9}.Release|x86.ActiveCfg = Release|Win32
+		{9443C25C-8778-480A-9FE0-32FEC70A0FF9}.Release|x86.Build.0 = Release|Win32
+		{10B1B430-D157-40FA-8F5F-12135BA7164F}.Debug|x86.ActiveCfg = Debug|Win32
+		{10B1B430-D157-40FA-8F5F-12135BA7164F}.Debug|x86.Build.0 = Debug|Win32
+		{10B1B430-D157-40FA-8F5F-12135BA7164F}.Release|x86.ActiveCfg = Release|Win32
+		{10B1B430-D157-40FA-8F5F-12135BA7164F}.Release|x86.Build.0 = Release|Win32
+		{25D4C32A-2231-4309-A41F-3384DCBAFE96}.Debug|x86.ActiveCfg = Debug|Win32
+		{25D4C32A-2231-4309-A41F-3384DCBAFE96}.Debug|x86.Build.0 = Debug|Win32
+		{25D4C32A-2231-4309-A41F-3384DCBAFE96}.Release|x86.ActiveCfg = Release|Win32
+		{25D4C32A-2231-4309-A41F-3384DCBAFE96}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

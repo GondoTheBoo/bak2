@@ -1,0 +1,51 @@
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+
+#Visual Studio files
+*.[Oo]bj
+*.pdb
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.[Cc]ache
+*.ilk
+*.log
+*.sbr
+*.sdf
+*.opensdf
+*.db
+*.opendb
+*.map
+*.iobj
+*.ipdb
+*.suo
+ipch/
+obj/
+[Dd]ebug*/
+[Rr]elease*/
+Ankh.NoLoad
+
+#Subversion files
+.svn
+
+#Office Temp Files
+~$*
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+#Specific Files
+junk/
+tmp/

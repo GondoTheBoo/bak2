@@ -1,0 +1,77 @@
+{
+		"window width": 1024,
+		"window height": 768,
+		"camera":
+		{
+			"near plane": 1.0,
+			"far plane": 100.0,
+			"field of view": 30.0,
+			"position": [0.0, 0.0, 20.0],
+			"look at": [0.0, 0.0, 0.0],
+			"up direction": [0.0, 1.0, 0.0]
+		},
+		"environment":
+		{
+			"ambient color" : [0.33, 0.66, 0.99],
+			"ambient intensity" : 0.05
+		},	
+		"assets": [
+		{
+			"file": "forest\\forest.obj",
+			"scaling": [0.025, 0.025, 0.025],
+			"translation": [0.0, -6.0, 0.0],
+			"rotation": [0.0, 0.0, 0.0, 1.0]
+		}],
+		"lights": [
+			{"type": "point","color": [1, 0.5, 0.413434],"intensity": 0.5,"position": [9.82971, 2.84762, -2.67067]},
+			{"type": "point","color": [0.378033, 1, 0.5],"intensity": 0.5,"position": [-9.42625, 3.24192, -8.17072]},
+			{"type": "point","color": [0.564064, 1, 0.5],"intensity": 0.5,"position": [-4.83993, -0.953612, -4.97238]},
+			{"type": "point","color": [1, 0.5, 0.522705],"intensity": 0.5,"position": [-2.37098, 3.69863, 8.07489]},
+			{"type": "point","color": [0.5, 1, 0.962719],"intensity": 0.5,"position": [1.40294, 0.981109, -0.630207]},
+			{"type": "point","color": [1, 0.5, 0.332279],"intensity": 0.5,"position": [0.459914, -0.532002, 0.132145]},
+			{"type": "point","color": [1, 0.450496, 0.5],"intensity": 0.5,"position": [4.4554, 0.80929, -4.5262]},
+			{"type": "point","color": [1, 0.5, 0.937572],"intensity": 0.5,"position": [3.40861, 3.8384, -8.38801]},
+			{"type": "point","color": [1, 0.5, 0.509668],"intensity": 0.5,"position": [-2.40883, 0.782891, 9.83642]},
+			{"type": "point","color": [0.5, 0.515341, 1],"intensity": 0.5,"position": [8.23115, 3.36155, 7.85699]},
+			{"type": "point","color": [0.5, 1, 0.623011],"intensity": 0.5,"position": [-5.33677, 0.844386, -0.837123]},
+			{"type": "point","color": [0.545021, 1, 0.5],"intensity": 0.5,"position": [-6.44765, 1.26371, -8.98495]},
+			{"type": "point","color": [0.315482, 1, 0.5],"intensity": 0.5,"position": [5.80676, 1.84997, -8.30683]},
+			{"type": "point","color": [1, 0.534874, 0.5],"intensity": 0.5,"position": [6.81753, 1.98059, 7.62627]},
+			{"type": "point","color": [0.5, 1, 0.848457],"intensity": 0.5,"position": [5.64013, -0.582812, 1.03244]},
+			{"type": "point","color": [1, 0.5, 0.928782],"intensity": 0.5,"position": [8.74569, 3.11756, 8.69198]},
+			{"type": "point","color": [0.5, 0.629456, 1],"intensity": 0.5,"position": [-6.03015, 3.39802, -7.52495]},
+			{"type": "point","color": [0.539171, 0.5, 1],"intensity": 0.5,"position": [-9.71801, 2.7344, 2.25867]},
+			{"type": "point","color": [0.5, 1, 0.331791],"intensity": 0.5,"position": [8.99594, 2.97549, 1.83935]},
+			{"type": "point","color": [1, 0.786835, 0.5],"intensity": 0.5,"position": [2.05481, 2.25587, -1.50548]},
+			{"type": "point","color": [1, 0.5, 0.717252],"intensity": 0.5,"position": [-6.99026, 2.3871, 6.78823]},
+			{"type": "point","color": [1, 0.478036, 0.5],"intensity": 0.5,"position": [-3.6784, 0.00695825, 7.26737]},
+			{"type": "point","color": [1, 0.586721, 0.5],"intensity": 0.5,"position": [-9.39879, 2.27265, -9.33836]},
+			{"type": "point","color": [0.637025, 0.5, 1],"intensity": 0.5,"position": [1.42918, 0.372723, 8.2226]},
+			{"type": "point","color": [1, 0.5, 0.635365],"intensity": 0.5,"position": [-0.638143, 1.64626, -1.19358]},
+			{"type": "point","color": [0.80871, 1, 0.5],"intensity": 0.5,"position": [8.764, 3.58342, -6.6393]},
+			{"type": "point","color": [0.537119, 0.5, 1],"intensity": 0.5,"position": [-6.9158, 0.494339, 7.3986]},
+			{"type": "point","color": [1, 0.5, 0.683706],"intensity": 0.5,"position": [-7.79717, 1.1247, 2.11829]},
+			{"type": "point","color": [0.5, 1, 0.869405],"intensity": 0.5,"position": [-2.52968, 2.99884, 4.77645]},
+			{"type": "point","color": [0.378179, 0.5, 1],"intensity": 0.5,"position": [0.0704975, 1.77337, 8.94345]},
+			{"type": "point","color": [0.915208, 0.5, 1],"intensity": 0.5,"position": [-1.67028, 1.38319, 5.26719]},
+			{"type": "point","color": [1, 0.5, 0.921604],"intensity": 0.5,"position": [-0.409863, 3.25672, 3.3726]},
+			{"type": "point","color": [0.640541, 1, 0.5],"intensity": 0.5,"position": [2.28675, 0.387066, -4.48592]},
+			{"type": "point","color": [1, 0.396881, 0.5],"intensity": 0.5,"position": [-6.16321, -0.462416, 2.61391]},
+			{"type": "point","color": [0.936741, 1, 0.5],"intensity": 0.5,"position": [9.98108, 2.36268, -6.69423]},
+			{"type": "point","color": [0.336576, 0.5, 1],"intensity": 0.5,"position": [-8.81039, 3.72594, -3.38115]},
+			{"type": "point","color": [0.593362, 1, 0.5],"intensity": 0.5,"position": [1.77099, 2.99792, -1.0947]},
+			{"type": "point","color": [0.334233, 1, 0.5],"intensity": 0.5,"position": [7.28874, 1.61208, 5.66698]},
+			{"type": "point","color": [1, 0.53296, 0.5],"intensity": 0.5,"position": [-4.06171, 2.66344, -1.12461]},
+			{"type": "point","color": [1, 0.5, 0.536485],"intensity": 0.5,"position": [-0.517288, 0.828059, -9.56297]},
+			{"type": "point","color": [1, 0.5, 0.907688],"intensity": 0.5,"position": [-0.610065, 3.38658, 2.40761]},
+			{"type": "point","color": [0.862032, 0.5, 1],"intensity": 0.5,"position": [-6.21326, 0.63274, -5.40819]},
+			{"type": "point","color": [0.5, 1, 0.585208],"intensity": 0.5,"position": [-9.13877, 1.44758, -9.84741]},
+			{"type": "point","color": [1, 0.591125, 0.5],"intensity": 0.5,"position": [4.33332, 2.32133, -0.148015]},
+			{"type": "point","color": [0.406745, 0.5, 1],"intensity": 0.5,"position": [-3.38054, 0.603137, -4.45296]},
+			{"type": "point","color": [0.322074, 0.5, 1],"intensity": 0.5,"position": [5.32456, 0.56133, -6.42506]},
+			{"type": "point","color": [0.690201, 0.5, 1],"intensity": 0.5,"position": [-1.33335, 0.933958, -1.36021]},
+			{"type": "point","color": [0.5, 1, 0.510792],"intensity": 0.5,"position": [-4.51277, 3.55214, 8.8348]},
+			{"type": "point","color": [1, 0.450056, 0.5],"intensity": 0.5,"position": [-4.55733, 3.31684, -7.57866]},
+			{"type": "point","color": [0.5, 0.557823, 1],"intensity": 0.5,"position": [-4.97421, 3.31013, -3.00394]}
+		]
+}

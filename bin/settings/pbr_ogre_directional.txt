@@ -1,0 +1,30 @@
+{
+		"window width": 768,
+		"window height": 768,
+		"camera":
+		{
+			"near plane": 1.0,
+			"far plane": 100.0,
+			"field of view": 30.0,
+			"position": [0.0, 0.0, 5.0],
+			"look at": [0.0, 0.0, 0.0],
+			"up direction": [0.0, 1.0, 0.0]
+		},
+		"environment":
+		{
+			"ambient color" : [1.0, 1.0, 1.0],
+			"ambient intensity" : 0.2,
+			"envmap" : "cube_env_2"
+		},	
+		"assets": [
+		{
+			"file": "ogre\\pbr_ogre.obj",
+			"scaling": [1.0, 1.0, 1.0],
+			"translation": [0.0, 0.0, 0.0],
+			"rotation": [0.0, 0.0, 0.0, 1.0]
+		}
+		],
+		"lights": [
+			{"type": "directional","color": [1, 1, 1],"intensity": 1,"direction": [0, -1, -0.5]}
+		]
+}

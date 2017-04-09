@@ -1,0 +1,46 @@
+{
+		"window width": 768,
+		"window height": 768,
+		"camera":
+		{
+			"near plane": 1.0,
+			"far plane": 100.0,
+			"field of view": 30.0,
+			"position": [0.0, 0.0, 5.0],
+			"look at": [0.0, 0.0, 0.0],
+			"up direction": [0.0, 1.0, 0.0]
+		},
+		"environment":
+		{
+			"ambient color" : [1.0, 1.0, 1.0],
+			"ambient intensity" : 0.2
+		},	
+		"assets": [
+		{
+			"file": "cubes\\white_cube.obj",
+			"scaling": [6.0, 6.0, 6.0],
+			"translation": [0.0, 0.0, 0.0],
+			"rotation": [0.0, 0.0, 0.0, 0.0]
+		},
+		{
+			"file": "ogre\\angry_ogre_untextured.obj",
+			"scaling": [1.0, 1.0, 1.0],
+			"translation": [0.0, 0.0, 0.0],
+			"rotation": [0.0, 0.0, 0.0, 0.0]
+		}
+		],
+		"lights": [
+			{"type": "point","color": [1, 0, 0],"intensity": 0.01,"position": [1.5, 0, 0]},
+			{"type": "point","color": [1, 0.5, 0],"intensity": 0.01,"position": [1.29904, 0, 0.75]},
+			{"type": "point","color": [1, 1, 0],"intensity": 0.01,"position": [0.75, 0, 1.29904]},
+			{"type": "point","color": [0.5, 1, 0],"intensity": 0.01,"position": [-6.55671e-08, 0, 1.5]},
+			{"type": "point","color": [0, 1, 0],"intensity": 0.01,"position": [-0.75, 0, 1.29904]},
+			{"type": "point","color": [0, 1, 0.5],"intensity": 0.01,"position": [-1.29904, 0, 0.75]},
+			{"type": "point","color": [0, 1, 1],"intensity": 0.01,"position": [-1.5, 0, -1.31134e-07]},
+			{"type": "point","color": [0, 0.5, 1],"intensity": 0.01,"position": [-1.29904, 0, -0.75]},
+			{"type": "point","color": [4.76837e-07, 0, 1],"intensity": 0.01,"position": [-0.75, 0, -1.29904]},
+			{"type": "point","color": [0.5, 0, 1],"intensity": 0.01,"position": [1.78873e-08, 0, -1.5]},
+			{"type": "point","color": [1, 0, 1],"intensity": 0.01,"position": [0.75, 0, -1.29904]},
+			{"type": "point","color": [1, 0, 0.5],"intensity": 0.01,"position": [1.29904, 0, -0.75]}
+		]
+}
