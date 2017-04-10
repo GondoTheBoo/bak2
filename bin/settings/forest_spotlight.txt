@@ -4,7 +4,7 @@
 		"camera":
 		{
 			"near plane": 1.0,
-			"far plane": 100.0,
+			"far plane": 500.0,
 			"field of view": 30.0,
 			"position": [0.0, 0.0, 20.0],
 			"look at": [0.0, 0.0, 0.0],

@@ -39,6 +39,12 @@ int main( int argc, char** argv )
 	const glm::mat4 screen2EyeTf = glm::inverse(viewportTf * projectionTf);	// needed to reconstruct position from depth
 #pragma endregion
 
+#pragma region InitRsmMatrices
+	const glm::mat4 lightViewTf = glm::lookAt(settings->mLights[0].mPosition, settings->mCamera.mCenterOfInterest, settings->mCamera.mUpDirection);
+	const glm::mat4 lightProjectionTf = glm::perspective(glm::radians(settings->mCamera.mFoV), aspectRatio, settings->mCamera.mZNear, settings->mCamera.mZFar);
+	const glm::mat4 lightScreen2EyeTf = glm::inverse(viewportTf * lightProjectionTf);	// needed to reconstruct position from depth
+#pragma endregion
+
 
 #pragma region LoadGlslShaders
 	std::vector< cg2::ShaderInfo > buildGBufferShaders = { cg2::ShaderInfo( cg2::ShaderType::VERTEX_SHADER, cg2::loadShaderSource( "shaders\\solution_deferred\\buildGBuffer.vert" ) ), cg2::ShaderInfo( cg2::ShaderType::FRAGMENT_SHADER, cg2::loadShaderSource( "shaders\\solution_deferred\\buildGBuffer.frag" ) ) };
@@ -49,6 +55,8 @@ int main( int argc, char** argv )
 	std::shared_ptr< cg2::GlslProgram > evalPointLightProgram = cg2::GlslProgram::create(evalPointLightShaders, true);
 	std::vector< cg2::ShaderInfo > evalSpotLightShaders = { cg2::ShaderInfo(cg2::ShaderType::VERTEX_SHADER, cg2::loadShaderSource("shaders\\solution_deferred\\evalSpotLight.vert")), cg2::ShaderInfo(cg2::ShaderType::FRAGMENT_SHADER, cg2::loadShaderSource("shaders\\solution_deferred\\evalSpotLight.frag")) };
 	std::shared_ptr< cg2::GlslProgram > evalSpotLightProgram = cg2::GlslProgram::create(evalSpotLightShaders, true);
+	std::vector< cg2::ShaderInfo > buildRsmShaders = { cg2::ShaderInfo(cg2::ShaderType::VERTEX_SHADER, cg2::loadShaderSource("shaders\\solution_deferred\\buildRsm.vert")), cg2::ShaderInfo(cg2::ShaderType::FRAGMENT_SHADER, cg2::loadShaderSource("shaders\\solution_deferred\\buildRsm.frag")) };
+	std::shared_ptr< cg2::GlslProgram > buildRsmProgram = cg2::GlslProgram::create(buildRsmShaders, true);
 #pragma endregion
 
 #pragma region ImportAssets
@@ -116,6 +124,59 @@ int main( int argc, char** argv )
 	}
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+	//lucas
+
+	GLuint handleToRsmGBuffer = 0;
+	std::vector< GLuint > handleToRsmGBufferTextures(5, 0);
+	const glm::vec4 normalsDefaultRsm(0.f, 0.f, 0.f, 0.f);
+	const glm::vec4 diffuseDefaultRsm(settings->mEnvironment.mAmbientColor * settings->mEnvironment.mAmbientIntensity, 1.f);
+	const glm::vec4 specularDefaultRsm(0.f, 0.f, 0.f, 0.f);
+	const glm::vec4 ambientDefaultRsm(0.f, 0.f, 0.f, 0.f);
+
+	//generate texture handle and bind texture
+	for (unsigned i = 0; i < handleToRsmGBufferTextures.size(); ++i) {
+		glGenTextures(1, std::addressof(handleToRsmGBufferTextures[i]));
+		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[i]);
+		if (i == 0)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, fboWidth, fboHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
+		else
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, fboWidth, fboHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
+
+	//generate and bind handle of Rsm buffer
+	glGenFramebuffers(1, std::addressof(handleToRsmGBuffer));
+
+	//bind drawbuffer and textures
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handleToRsmGBuffer);
+
+	//assign the depth values, and colors to the handles from before
+	for (unsigned i = 0; i < handleToRsmGBufferTextures.size(); ++i) {
+		if (i == 0)
+			glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, handleToRsmGBufferTextures[i], 0);
+		else
+			glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (i - 1), handleToRsmGBufferTextures[i], 0);
+	}
+
+
+	//add this line and replace, if i want to render to other color attachments etc... differnet than previous setup
+	//std::vector< GLenum > fboBuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glDrawBuffers(fboBuffers.size(), fboBuffers.data());
+
+	GLenum statusCodeRsm = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+	if (statusCodeRsm != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "framebuffer invalid, status code " << statusCodeRsm << std::endl;
+		return -1;
+	}
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+	// end lucas
+
+
 #pragma endregion
 
 	cg2::Arcball cameraController(glm::uvec2(0, 0), glm::uvec2(settings->mGeneral.mWindowWidth, settings->mGeneral.mWindowWidth));
@@ -152,6 +213,102 @@ int main( int argc, char** argv )
 			break;
 		}
 #pragma endregion
+		
+		/*
+#pragma region RSMPass
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glDepthMask(GL_TRUE);
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handleToRsmGBuffer);
+		const float one = 1.f;
+		glClearBufferfv(GL_DEPTH, 0, &one);
+		glClearBufferfv(GL_COLOR, 0, &normalsDefaultRsm[0]);
+		glClearBufferfv(GL_COLOR, 1, &diffuseDefaultRsm[0]);
+		glClearBufferfv(GL_COLOR, 2, &specularDefaultRsm[0]);
+		glClearBufferfv(GL_COLOR, 3, &ambientDefaultRsm[0]);
+
+		glViewport(0, 0, fboWidth, fboHeight);
+
+		cg2::GlslProgram::setActiveProgram(buildRsmProgram);
+		for (auto asset : assets)
+		{
+			for (auto node : asset.model->mScenegraph)
+			{
+				glm::mat4 modelTf = asset.sceneTf * node->mModelTf;
+				glm::mat4 modelviewTf = viewTf * modelTf;
+				glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
+				glm::mat3 normals2eyeTf = glm::mat3(glm::inverse(glm::transpose(modelviewTf)));
+
+				buildRsmProgram->setUniformMat4("mvpTf", mvpTf);
+				buildRsmProgram->setUniformMat3("normals2eyeTf", normals2eyeTf);
+
+				for (auto id : node->mMeshIds)
+				{
+					auto meshData = asset.model->mMeshDataCPU[id];
+					auto vao = asset.model->mVAOs[id];
+
+					if (!meshData.mMaterial.mDiffuseTexture.empty())
+					{
+						auto texture = asset.model->mTextures.at(meshData.mMaterial.mDiffuseTexture);
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, texture->mHandle);
+						buildRsmProgram->setUniformBVal("hasDiffuseTexture", true);
+					}
+					else
+					{
+						buildRsmProgram->setUniformBVal("hasDiffuseTexture", false);
+					}
+
+					buildRsmProgram->setUniformTexVal("diffuseTexture", 0);
+					buildRsmProgram->setUniformVec3("kDiffuse", meshData.mMaterial.mKDiffuse);
+
+					if (!meshData.mMaterial.mSpecularTexture.empty())
+					{
+						auto texture = asset.model->mTextures.at(meshData.mMaterial.mSpecularTexture);
+						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, texture->mHandle);
+						buildRsmProgram->setUniformBVal("hasSpecularTexture", true);
+					}
+					else
+					{
+						buildRsmProgram->setUniformBVal("hasSpecularTexture", false);
+					}
+
+					buildRsmProgram->setUniformTexVal("specularTexture", 1);
+					buildRsmProgram->setUniformVec3("kSpecular", meshData.mMaterial.mKSpecular);
+
+					if (!meshData.mMaterial.mAOTexture.empty())
+					{
+						auto texture = asset.model->mTextures.at(meshData.mMaterial.mAOTexture);
+						glActiveTexture(GL_TEXTURE2);
+						glBindTexture(GL_TEXTURE_2D, texture->mHandle);
+						buildRsmProgram->setUniformBVal("hasAmbientTexture", true);
+					}
+					else
+					{
+						buildRsmProgram->setUniformBVal("hasAmbientTexture", false);
+					}
+
+					buildRsmProgram->setUniformTexVal("ambientTexture", 2);
+					buildRsmProgram->setUniformVec3("kAmbient", meshData.mMaterial.mKAmbient);
+
+					buildRsmProgram->setUniformVal("shininess", meshData.mMaterial.mShininess);
+
+					glBindVertexArray(vao);
+					glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
+				}
+			}
+		}
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, 0);
+#pragma endregion
+*/
 
 #pragma region RenderPass1
 		glEnable(GL_DEPTH_TEST);
@@ -358,7 +515,7 @@ int main( int argc, char** argv )
 
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
-
+/*
 #pragma region PointLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -412,7 +569,7 @@ int main( int argc, char** argv )
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 #pragma endregion
-
+*/
 #pragma region SpotLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);

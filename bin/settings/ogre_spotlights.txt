@@ -4,9 +4,9 @@
 		"camera":
 		{
 			"near plane": 1.0,
-			"far plane": 100.0,
+			"far plane": 500.0,
 			"field of view": 30.0,
-			"position": [0.0, 0.0, 5.0],
+			"position": [0.0, 15.0, -20.0],
 			"look at": [0.0, 0.0, 0.0],
 			"up direction": [0.0, 1.0, 0.0]
 		},
@@ -17,22 +17,13 @@
 		},	
 		"assets": [
 		{
-			"file": "cubes\\white_cube.obj",
-			"scaling": [8.0, 8.0, 8.0],
-			"translation": [0.0, 0.0, 0.0],
-			"rotation": [0.0, 0.0, 0.0, 0.0]
-		},
-		{
-			"file": "ogre\\angry_ogre_untextured.obj",
+			"file": "testScene\\TestScene.obj",
 			"scaling": [1.0, 1.0, 1.0],
 			"translation": [0.0, 0.0, 0.0],
-			"rotation": [0.0, 0.0, 0.0, 0.0]
+			"rotation": [0.0, 1.0, 0.0, 0.0]
 		}
 		],
 		"lights": [
-			{"type": "spot", "direction": [-1, -1,  0], "angle":40.0, "color": [1, 1, 1],"intensity": 0.8,"position": [ 2, 1,  0]},
-			{"type": "spot", "direction": [ 0, -1, -1], "angle":40.0, "color": [1, 1, 1],"intensity": 0.8,"position": [ 0, 1,  2]},
-			{"type": "spot", "direction": [ 1, -1,  0], "angle":40.0, "color": [1, 1, 1],"intensity": 0.8,"position": [-2, 1,  0]},
-			{"type": "spot", "direction": [ 0, -1,  1], "angle":40.0, "color": [1, 1, 1],"intensity": 0.8,"position": [ 0, 1, -2]}
+			{"type": "spot", "direction": [ 0, -1,  -1], "angle":40.0, "color": [1, 1, 1],"intensity": 1000,"position": [ 0, 25, 40]}
 		]
 }
