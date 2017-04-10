@@ -214,7 +214,6 @@ int main( int argc, char** argv )
 		}
 #pragma endregion
 		
-		/*
 #pragma region RSMPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
@@ -236,8 +235,8 @@ int main( int argc, char** argv )
 			for (auto node : asset.model->mScenegraph)
 			{
 				glm::mat4 modelTf = asset.sceneTf * node->mModelTf;
-				glm::mat4 modelviewTf = viewTf * modelTf;
-				glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
+				glm::mat4 modelviewTf = lightViewTf * modelTf;
+				glm::mat4 mvpTf = projectionTf * lightViewTf * modelTf;
 				glm::mat3 normals2eyeTf = glm::mat3(glm::inverse(glm::transpose(modelviewTf)));
 
 				buildRsmProgram->setUniformMat4("mvpTf", mvpTf);
@@ -307,8 +306,12 @@ int main( int argc, char** argv )
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glViewport(0, 0, settings->mGeneral.mWindowWidth, settings->mGeneral.mWindowHeight);
 #pragma endregion
-*/
+
 
 #pragma region RenderPass1
 		glEnable(GL_DEPTH_TEST);
@@ -316,7 +319,7 @@ int main( int argc, char** argv )
 		glDepthMask(GL_TRUE);
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handleToGBuffer);
-		const float one = 1.f;
+		//const float one = 1.f;
 		glClearBufferfv(GL_DEPTH, 0, &one);
 		glClearBufferfv(GL_COLOR, 0, &normalsDefault[0]);
 		glClearBufferfv(GL_COLOR, 1, &diffuseDefault[0]);
@@ -465,9 +468,11 @@ int main( int argc, char** argv )
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
 
+
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glViewport(0, 0, settings->mGeneral.mWindowWidth, settings->mGeneral.mWindowHeight);
-
+		
+		//bind G-buffer
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, handleToGBufferTextures[0]);
 		glActiveTexture(GL_TEXTURE1);
@@ -478,6 +483,20 @@ int main( int argc, char** argv )
 		glBindTexture(GL_TEXTURE_2D, handleToGBufferTextures[3]);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, handleToGBufferTextures[4]);
+		
+		//bind Rsm textures
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[0]);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[1]);
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[2]);
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[3]);
+		glActiveTexture(GL_TEXTURE9);
+		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[4]);
+		
+		const glm::mat4 testViewTf = viewTf;
 
 #pragma region AmbientAndDirectionalPass
 		glEnable(GL_DEPTH_TEST);
@@ -493,7 +512,7 @@ int main( int argc, char** argv )
 			{
 				numberOfDirectionalLights += 1;
 				std::string uniformBase = "lightSources[" + std::to_string(numberOfDirectionalLights) + "]";
-				glm::vec4 lightDirection = viewTf * glm::vec4(light.mDirection, 0.f);
+				glm::vec4 lightDirection = testViewTf * glm::vec4(light.mDirection, 0.f);
 				evalAmbientAndDirectionalLightsProgram->setUniformVec3(uniformBase +".direction", glm::vec3(lightDirection));
 				evalAmbientAndDirectionalLightsProgram->setUniformVal(uniformBase + ".intensity", light.mIntensity);
 				evalAmbientAndDirectionalLightsProgram->setUniformVec3(uniformBase + ".color", light.mColor);
@@ -570,6 +589,8 @@ int main( int argc, char** argv )
 		glDisable(GL_BLEND);
 #pragma endregion
 */
+
+
 #pragma region SpotLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -586,14 +607,18 @@ int main( int argc, char** argv )
 		evalSpotLightProgram->setUniformTexVal("textureB", 1);
 		evalSpotLightProgram->setUniformTexVal("textureC", 2);
 		evalSpotLightProgram->setUniformTexVal("textureD", 3);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_depth", 5);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_normal", 6);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_diff", 7);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_spec", 8);
 		evalSpotLightProgram->setUniformMat4("screen2eyeTf", screen2EyeTf);
 
 		for (auto light : settings->mLights)
 		{
 			if (light.mType == LightType::Spot)
 			{
-				glm::vec4 lightPosition = viewTf * glm::vec4(light.mPosition, 1.f);
-				glm::vec4 lightDirection = viewTf * glm::vec4(light.mDirection, 0.f);
+				glm::vec4 lightPosition = testViewTf * glm::vec4(light.mPosition, 1.f);
+				glm::vec4 lightDirection = testViewTf * glm::vec4(light.mDirection, 0.f);
 				evalSpotLightProgram->setUniformVec4("lightSource.position", lightPosition);
 				evalSpotLightProgram->setUniformVec3("lightSource.direction", glm::vec3(lightDirection));
 				evalSpotLightProgram->setUniformVal("lightSource.intensity", light.mIntensity);
@@ -607,9 +632,19 @@ int main( int argc, char** argv )
 				for (auto node : spotlightModel->mScenegraph)
 				{
 					glm::mat4 modelTf = lightTf * node->mModelTf;
-					glm::mat4 modelviewTf = viewTf * modelTf;
-					glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
+					glm::mat4 modelviewTf = testViewTf * modelTf;
+					glm::mat4 mvpTf = projectionTf * testViewTf * modelTf;
+					glm::mat4 mvpLightTf = projectionTf * lightViewTf * modelTf;
+					glm::mat4 biasMatrix(
+						0.5, 0.0, 0.0, 0.0,
+						0.0, 0.5, 0.0, 0.0,
+						0.0, 0.0, 0.5, 0.0,
+						0.5, 0.5, 0.5, 1.0
+						);
+					glm::mat4 depthBiasMVP = biasMatrix*mvpLightTf;
+
 					evalSpotLightProgram->setUniformMat4("mvpTf", mvpTf);
+					evalSpotLightProgram->setUniformMat4("depthBiasMVP", depthBiasMVP);
 
 					for (auto id : node->mMeshIds)
 					{
@@ -636,6 +671,17 @@ int main( int argc, char** argv )
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE9);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 #pragma region Update

@@ -2,6 +2,8 @@
 
 layout ( location = 0 ) out vec4 fragmentColor;
 
+in vec4 RsmTexCoor;
+
 const float PI = 3.14159265359;
 const int MAX_LIGHTS = 100;
 const float MAX_SHININESS = 1000.0;
@@ -11,6 +13,11 @@ uniform sampler2D textureA;
 uniform sampler2D textureB;
 uniform sampler2D textureC;
 uniform sampler2D textureD;
+
+uniform sampler2D tex_rsm_depth;
+uniform sampler2D tex_rsm_normal;
+uniform sampler2D tex_rsm_diff;
+uniform sampler2D tex_rsm_spec;
 
 uniform mat4 screen2eyeTf;
 
@@ -35,6 +42,14 @@ struct FragmentAttribs
 	vec3 normal;
 	int solidFlag;
 };
+
+vec4 readRsm()
+{
+	//vec4 texDepth = texelFetch(tex_rsm_depth, ivec2(RsmTexCoor.xy), 0);
+	vec4 texDepth = texelFetch(tex_rsm_depth, ivec2(gl_FragCoord.xy), 0);
+	return texDepth.xyzw;
+}
+
 
 FragmentAttribs readGBuffer()
 {
@@ -61,14 +76,14 @@ FragmentAttribs readGBuffer()
 void main()
 {	
 	FragmentAttribs attributes = readGBuffer();
-
+	vec4 rsmDepth = readRsm();
+	
 	if (attributes.solidFlag == 1)
 	{
 		fragmentColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 	}
 	else
 	{
-
 		vec3 N = normalize( attributes.normal.xyz );
 		vec3 V = normalize( -attributes.position.xyz );
 
@@ -89,7 +104,12 @@ void main()
 		vec3 color = lightSource.intensity * lightSource.color * lightFalloff * angularCutoff * dotNL * attributes.kD;
 		if (dotNL > 0)
 			color += lightSource.intensity * lightSource.color * lightFalloff * angularCutoff * phongTerm * attributes.kS;
-		//fragmentColor = vec4(N,1.0);
-		fragmentColor = vec4( clamp( color, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
+			
+		float visibility = 1.0;
+		if(rsmDepth.z < attributes.position.z)
+			visibility = 0.5;
+			
+		//fragmentColor = readRsm();
+		fragmentColor = vec4( clamp( color * visibility, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
 	}
 }

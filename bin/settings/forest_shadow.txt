@@ -1,0 +1,36 @@
+{
+		"window width": 1024,
+		"window height": 768,
+		"camera":
+		{
+			"near plane": 1.0,
+			"far plane": 500.0,
+			"field of view": 30.0,
+			"position": [0.0, 5.0, 20.0],
+			"look at": [0.0, 0.0, 0.0],
+			"up direction": [0.0, 1.0, 0.0]
+		},
+		"environment":
+		{
+			"ambient color" : [0.33, 0.66, 0.99],
+			"ambient intensity" : 0.05
+		},	
+		"assets": [
+		{
+			"file": "forest\\forest.obj",
+			"scaling": [0.025, 0.025, 0.025],
+			"translation": [0.0, -6.0, 0.0],
+			"rotation": [0.0, 0.0, 0.0, 1.0]
+		}
+		],
+		"lights": [
+		{
+			"type": "spot",
+			"color" : [1.0, 1.0, 1.0],
+			"intensity" : 500.0,
+			"position" : [0.0, 15.0, -15.0],
+			"direction" : [0.0, -1.0, 1.0],
+			"angle" : 45.0
+		}
+		]
+}
