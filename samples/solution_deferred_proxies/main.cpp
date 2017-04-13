@@ -236,9 +236,10 @@ int main( int argc, char** argv )
 			{
 				glm::mat4 modelTf = asset.sceneTf * node->mModelTf;
 				glm::mat4 modelviewTf = lightViewTf * modelTf;
-				glm::mat4 mvpTf = projectionTf * lightViewTf * modelTf;
+				glm::mat4 mvpTf = lightProjectionTf * lightViewTf * modelTf;
 				glm::mat3 normals2eyeTf = glm::mat3(glm::inverse(glm::transpose(modelviewTf)));
 
+				buildRsmProgram->setUniformMat4("mTf", modelTf);
 				buildRsmProgram->setUniformMat4("mvpTf", mvpTf);
 				buildRsmProgram->setUniformMat3("normals2eyeTf", normals2eyeTf);
 
@@ -261,38 +262,6 @@ int main( int argc, char** argv )
 
 					buildRsmProgram->setUniformTexVal("diffuseTexture", 0);
 					buildRsmProgram->setUniformVec3("kDiffuse", meshData.mMaterial.mKDiffuse);
-
-					if (!meshData.mMaterial.mSpecularTexture.empty())
-					{
-						auto texture = asset.model->mTextures.at(meshData.mMaterial.mSpecularTexture);
-						glActiveTexture(GL_TEXTURE1);
-						glBindTexture(GL_TEXTURE_2D, texture->mHandle);
-						buildRsmProgram->setUniformBVal("hasSpecularTexture", true);
-					}
-					else
-					{
-						buildRsmProgram->setUniformBVal("hasSpecularTexture", false);
-					}
-
-					buildRsmProgram->setUniformTexVal("specularTexture", 1);
-					buildRsmProgram->setUniformVec3("kSpecular", meshData.mMaterial.mKSpecular);
-
-					if (!meshData.mMaterial.mAOTexture.empty())
-					{
-						auto texture = asset.model->mTextures.at(meshData.mMaterial.mAOTexture);
-						glActiveTexture(GL_TEXTURE2);
-						glBindTexture(GL_TEXTURE_2D, texture->mHandle);
-						buildRsmProgram->setUniformBVal("hasAmbientTexture", true);
-					}
-					else
-					{
-						buildRsmProgram->setUniformBVal("hasAmbientTexture", false);
-					}
-
-					buildRsmProgram->setUniformTexVal("ambientTexture", 2);
-					buildRsmProgram->setUniformVec3("kAmbient", meshData.mMaterial.mKAmbient);
-
-					buildRsmProgram->setUniformVal("shininess", meshData.mMaterial.mShininess);
 
 					glBindVertexArray(vao);
 					glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
@@ -504,21 +473,6 @@ int main( int argc, char** argv )
 		glDepthMask(GL_TRUE);
 
 		cg2::GlslProgram::setActiveProgram(evalAmbientAndDirectionalLightsProgram);
-
-		unsigned numberOfDirectionalLights = 0;
-		for (auto light : settings->mLights)
-		{
-			if (light.mType == LightType::Directional)
-			{
-				numberOfDirectionalLights += 1;
-				std::string uniformBase = "lightSources[" + std::to_string(numberOfDirectionalLights) + "]";
-				glm::vec4 lightDirection = testViewTf * glm::vec4(light.mDirection, 0.f);
-				evalAmbientAndDirectionalLightsProgram->setUniformVec3(uniformBase +".direction", glm::vec3(lightDirection));
-				evalAmbientAndDirectionalLightsProgram->setUniformVal(uniformBase + ".intensity", light.mIntensity);
-				evalAmbientAndDirectionalLightsProgram->setUniformVec3(uniformBase + ".color", light.mColor);
-			}
-		}
-		evalAmbientAndDirectionalLightsProgram->setUniformIVal("lightCount", numberOfDirectionalLights);
 		evalAmbientAndDirectionalLightsProgram->setUniformVal("ambientIntensity", settings->mEnvironment.mAmbientIntensity);
 		evalAmbientAndDirectionalLightsProgram->setUniformVec3("ambientColor", settings->mEnvironment.mAmbientColor);
 		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("textureA", 0);

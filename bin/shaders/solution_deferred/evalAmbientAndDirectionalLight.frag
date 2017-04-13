@@ -3,7 +3,6 @@
 layout ( location = 0 ) out vec4 fragmentColor;
 
 const float PI = 3.14159265359;
-const int MAX_LIGHTS = 100;
 const float MAX_SHININESS = 1000.0;
 
 uniform sampler2D textureA;
@@ -14,15 +13,6 @@ uniform sampler2D textureE;
 
 uniform mat4 screen2eyeTf;
 
-struct LightSource
-{
-	float intensity;
-	vec3 color;
-	vec3 direction;
-};
-
-uniform LightSource[MAX_LIGHTS] lightSources;
-uniform int lightCount = 0;
 uniform float ambientIntensity = 0.1;
 uniform vec3 ambientColor = vec3( 1.0 );
 
@@ -77,25 +67,9 @@ void main()
 	}
 	else
 	{
-		vec3 N = normalize( attributes.normal.xyz );
-		vec3 V = normalize( -attributes.position.xyz );
-		
-
 		vec3 ambient = ambientIntensity * ambientColor * attributes.kA;
 		vec3 color = ambient;
-		for (int i=0; i<min(lightCount, MAX_LIGHTS); ++i)
-		{
-			vec3 L = normalize( -lightSources[i].direction );
 
-			vec3 R = reflect( -L, N );	
-			float dotNL = max( dot( N, L ), 0.0 );
-			float phongTerm = pow( max( dot( R, V ), 0.0 ), attributes.shininess );
-	
-			color += lightSources[i].intensity * lightSources[i].color * dotNL * attributes.kD;
-			if (dotNL > 0)
-				color += lightSources[i].intensity * lightSources[i].color * phongTerm * attributes.kS;
-		}
-		//fragmentColor = vec4(1.0, 0.0, 0.0, 1.0);
-		fragmentColor = vec4( clamp( color, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
+		fragmentColor = vec4(color, 1.0 );
 	}
 }
