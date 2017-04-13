@@ -14,15 +14,6 @@ uniform sampler2D texNormal;
 uniform sampler2D texDiff;
 uniform sampler2D texSpec;
 
-uniform sampler2D tex_rsm_depth;
-uniform sampler2D tex_rsm_normal;
-uniform sampler2D tex_rsm_diff;
-uniform sampler2D tex_rsm_worldCoord;
-
-uniform mat4 screen2eyeTf;
-uniform mat4 eye2worldTf;
-uniform mat4 lightViewProjectionTf;
-
 struct LightSource
 {
 	uint type;
@@ -71,14 +62,6 @@ FragmentAttribs readGBuffer()
 void main()
 {	
 	FragmentAttribs attributes = readGBuffer();
-	//vec4 lightScreenPos = RsmTexCoor.xyzw / RsmTexCoor.w;
-	//vec4 rsmDepth = texelFetch(tex_rsm_depth,ivec2(lightScreenPos.xy),0);
-	
-	vec4 worldPos = eye2worldTf * attributes.position;
-	vec4 lightEyePos = lightViewProjectionTf * worldPos;
-	vec4 lightscreenPos = lightEyePos.xyzw / lightEyePos.w;
-	vec4 rsmDepth = texelFetch(tex_rsm_depth,ivec2(lightscreenPos.xy),0);
-	
 	
 	if (attributes.solidFlag == 1)
 	{
@@ -105,14 +88,9 @@ void main()
 	
 		vec3 color = lightSource.intensity * lightSource.color * lightFalloff * angularCutoff * dotNL * attributes.kD;
 		if (dotNL > 0)
-			color += lightSource.intensity * lightSource.color * lightFalloff * angularCutoff * phongTerm * attributes.kS;
+			color += lightSource.intensity * lightSource.color * lightFalloff * angularCutoff * phongTerm * attributes.kS;	
 			
-		float bias = 0.0005;
-		float visibility = 1.0;
-		if(rsmDepth.r < lightscreenPos.z-bias)
-			visibility = 0.5;
-			
-		//fragmentColor = vec4(RsmTexCoor.z,RsmTexCoor.z,RsmTexCoor.z,1.0);
-		fragmentColor = vec4( clamp( color * visibility, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
+		fragmentColor = vec4(1.0,0.0,0.0,1.0);
+		//fragmentColor = vec4( clamp( color * visibility, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
 	}
 }

@@ -84,6 +84,7 @@ void main()
 		vec3 color = lightSource.intensity * lightSource.color * lightFalloff * dotNL * attributes.kD;
 		if (dotNL > 0)
 			color += lightSource.intensity * lightSource.color * lightFalloff * phongTerm * attributes.kS;
-		fragmentColor = vec4( clamp( color, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
+		//fragmentColor = vec4( clamp( color, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
+		fragmentColor = vec4(1.0,0.0,0.0,1.0);
 	}
 }

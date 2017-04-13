@@ -42,7 +42,8 @@ int main( int argc, char** argv )
 #pragma region InitRsmMatrices
 	const glm::mat4 lightViewTf = glm::lookAt(settings->mLights[0].mPosition, settings->mCamera.mCenterOfInterest, settings->mCamera.mUpDirection);
 	const glm::mat4 lightProjectionTf = glm::perspective(glm::radians(settings->mCamera.mFoV), aspectRatio, settings->mCamera.mZNear, settings->mCamera.mZFar);
-	const glm::mat4 lightScreen2EyeTf = glm::inverse(viewportTf * lightProjectionTf);	// needed to reconstruct position from depth
+	const glm::mat4 lightWorld2Screen = viewportTf * lightProjectionTf * lightViewTf;
+	const glm::mat4 lightScreen2WorldTf = glm::inverse(lightWorld2Screen);	// needed to reconstruct position from depth
 #pragma endregion
 
 
@@ -464,8 +465,6 @@ int main( int argc, char** argv )
 		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[3]);
 		glActiveTexture(GL_TEXTURE9);
 		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[4]);
-		
-		const glm::mat4 testViewTf = viewTf;
 
 #pragma region AmbientAndDirectionalPass
 		glEnable(GL_DEPTH_TEST);
@@ -475,11 +474,9 @@ int main( int argc, char** argv )
 		cg2::GlslProgram::setActiveProgram(evalAmbientAndDirectionalLightsProgram);
 		evalAmbientAndDirectionalLightsProgram->setUniformVal("ambientIntensity", settings->mEnvironment.mAmbientIntensity);
 		evalAmbientAndDirectionalLightsProgram->setUniformVec3("ambientColor", settings->mEnvironment.mAmbientColor);
-		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("textureA", 0);
-		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("textureB", 1);
-		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("textureC", 2);
-		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("textureD", 3);
-		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("textureE", 4);
+		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("texDepth", 0);
+		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("texDiff", 2);
+		evalAmbientAndDirectionalLightsProgram->setUniformTexVal("texAmb", 4);
 		evalAmbientAndDirectionalLightsProgram->setUniformMat4("screen2eyeTf", screen2EyeTf);
 
 		glBindVertexArray(fullscreenQuad);
@@ -488,7 +485,8 @@ int main( int argc, char** argv )
 
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
-/*
+
+		/*
 #pragma region PointLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -506,6 +504,8 @@ int main( int argc, char** argv )
 		evalPointLightProgram->setUniformTexVal("textureC", 2);
 		evalPointLightProgram->setUniformTexVal("textureD", 3);
 		evalPointLightProgram->setUniformMat4("screen2eyeTf", screen2EyeTf);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_depth", 5);
+		evalSpotLightProgram->setUniformMat4("lightScreen2WorldTf", lightScreen2WorldTf);
 
 		for (auto light : settings->mLights)
 		{
@@ -516,25 +516,25 @@ int main( int argc, char** argv )
 				evalPointLightProgram->setUniformVal("lightSource.intensity", light.mIntensity);
 				evalPointLightProgram->setUniformVec3("lightSource.color", light.mColor);
 
-				const float epsilon = 0.01f; // matches shader epsilon
-				float scale = glm::sqrt(light.mIntensity / epsilon);
-				glm::mat4 lightTf = glm::translate(glm::mat4(1.f), light.mPosition) * glm::scale( glm::mat4( 1.f ), glm::vec3(scale) );
-
-					for (auto node : pointlightModel->mScenegraph)
+				//const float epsilon = 0.01f; // matches shader epsilon
+				//float scale = glm::sqrt(light.mIntensity / epsilon);
+				glm::mat4 scaleTf = glm::scale(glm::mat4(1.f), glm::vec3(100));
+				for (auto node : pointlightModel->mScenegraph)
+				{
+					glm::mat4 modelTf = scaleTf * node->mModelTf;
+					glm::mat4 modelviewTf = viewTf * modelTf;
+					glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
+					glm::mat4 vpTf = projectionTf * viewTf;
+					evalPointLightProgram->setUniformMat4("mTf", modelTf);
+					evalPointLightProgram->setUniformMat4("vpTf", vpTf);
+					for (auto id : node->mMeshIds)
 					{
-						glm::mat4 modelTf = lightTf * node->mModelTf;
-						glm::mat4 modelviewTf = viewTf * modelTf;
-						glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
-						evalPointLightProgram->setUniformMat4("mvpTf", mvpTf);
-
-						for (auto id : node->mMeshIds)
-						{
-							auto meshData = pointlightModel->mMeshDataCPU[id];
-							auto vao = pointlightModel->mVAOs[id];
-							glBindVertexArray(vao);
-							glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
-						}
+						auto meshData = pointlightModel->mMeshDataCPU[id];
+						auto vao = pointlightModel->mVAOs[id];
+						glBindVertexArray(vao);
+						glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
 					}
+				}
 			}
 		}
 
@@ -542,9 +542,9 @@ int main( int argc, char** argv )
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 #pragma endregion
-*/
+		*/
 
-
+		
 #pragma region SpotLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -557,22 +557,27 @@ int main( int argc, char** argv )
 		glBlendFunc(GL_ONE, GL_ONE);
 
 		cg2::GlslProgram::setActiveProgram(evalSpotLightProgram);
-		evalSpotLightProgram->setUniformTexVal("textureA", 0);
-		evalSpotLightProgram->setUniformTexVal("textureB", 1);
-		evalSpotLightProgram->setUniformTexVal("textureC", 2);
-		evalSpotLightProgram->setUniformTexVal("textureD", 3);
+
+		const glm::mat4 eye2worldTf = glm::inverse(viewTf);
+
+		evalSpotLightProgram->setUniformTexVal("texDepth", 0);
+		evalSpotLightProgram->setUniformTexVal("texNormal", 1);
+		evalSpotLightProgram->setUniformTexVal("texDiff", 2);
+		evalSpotLightProgram->setUniformTexVal("texSpec", 3);
 		evalSpotLightProgram->setUniformTexVal("tex_rsm_depth", 5);
 		evalSpotLightProgram->setUniformTexVal("tex_rsm_normal", 6);
 		evalSpotLightProgram->setUniformTexVal("tex_rsm_diff", 7);
-		evalSpotLightProgram->setUniformTexVal("tex_rsm_spec", 8);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_worldCoord", 8);
 		evalSpotLightProgram->setUniformMat4("screen2eyeTf", screen2EyeTf);
-
+		evalSpotLightProgram->setUniformMat4("eye2worldTf", eye2worldTf);
+		evalSpotLightProgram->setUniformMat4("lightViewProjectionTf", lightWorld2Screen);			
+		
 		for (auto light : settings->mLights)
 		{
 			if (light.mType == LightType::Spot)
 			{
-				glm::vec4 lightPosition = testViewTf * glm::vec4(light.mPosition, 1.f);
-				glm::vec4 lightDirection = testViewTf * glm::vec4(light.mDirection, 0.f);
+				glm::vec4 lightPosition = viewTf * glm::vec4(light.mPosition, 1.f);
+				glm::vec4 lightDirection = viewTf * glm::vec4(light.mDirection, 0.f);
 				evalSpotLightProgram->setUniformVec4("lightSource.position", lightPosition);
 				evalSpotLightProgram->setUniformVec3("lightSource.direction", glm::vec3(lightDirection));
 				evalSpotLightProgram->setUniformVal("lightSource.intensity", light.mIntensity);
@@ -586,19 +591,12 @@ int main( int argc, char** argv )
 				for (auto node : spotlightModel->mScenegraph)
 				{
 					glm::mat4 modelTf = lightTf * node->mModelTf;
-					glm::mat4 modelviewTf = testViewTf * modelTf;
-					glm::mat4 mvpTf = projectionTf * testViewTf * modelTf;
-					glm::mat4 mvpLightTf = projectionTf * lightViewTf * modelTf;
-					glm::mat4 biasMatrix(
-						0.5, 0.0, 0.0, 0.0,
-						0.0, 0.5, 0.0, 0.0,
-						0.0, 0.0, 0.5, 0.0,
-						0.5, 0.5, 0.5, 1.0
-						);
-					glm::mat4 depthBiasMVP = biasMatrix*mvpLightTf;
+					glm::mat4 modelviewTf = viewTf * modelTf;
+					glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
+					glm::mat4 local2lightScreenTf = viewportTf * lightProjectionTf * lightViewTf * modelTf;
 
 					evalSpotLightProgram->setUniformMat4("mvpTf", mvpTf);
-					evalSpotLightProgram->setUniformMat4("depthBiasMVP", depthBiasMVP);
+					evalSpotLightProgram->setUniformMat4("local2lightScreenTf", local2lightScreenTf);
 
 					for (auto id : node->mMeshIds)
 					{
