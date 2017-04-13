@@ -129,11 +129,8 @@ int main( int argc, char** argv )
 	//lucas
 
 	GLuint handleToRsmGBuffer = 0;
-	std::vector< GLuint > handleToRsmGBufferTextures(5, 0);
-	const glm::vec4 normalsDefaultRsm(0.f, 0.f, 0.f, 0.f);
-	const glm::vec4 diffuseDefaultRsm(settings->mEnvironment.mAmbientColor * settings->mEnvironment.mAmbientIntensity, 1.f);
-	const glm::vec4 specularDefaultRsm(0.f, 0.f, 0.f, 0.f);
-	const glm::vec4 ambientDefaultRsm(0.f, 0.f, 0.f, 0.f);
+	std::vector< GLuint > handleToRsmGBufferTextures(4, 0);
+	const glm::vec4 texDefaultRsm(0.f, 0.f, 0.f, 0.f);
 
 	//generate texture handle and bind texture
 	for (unsigned i = 0; i < handleToRsmGBufferTextures.size(); ++i) {
@@ -223,10 +220,9 @@ int main( int argc, char** argv )
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handleToRsmGBuffer);
 		const float one = 1.f;
 		glClearBufferfv(GL_DEPTH, 0, &one);
-		glClearBufferfv(GL_COLOR, 0, &normalsDefaultRsm[0]);
-		glClearBufferfv(GL_COLOR, 1, &diffuseDefaultRsm[0]);
-		glClearBufferfv(GL_COLOR, 2, &specularDefaultRsm[0]);
-		glClearBufferfv(GL_COLOR, 3, &ambientDefaultRsm[0]);
+		glClearBufferfv(GL_COLOR, 0, &texDefaultRsm[0]);
+		glClearBufferfv(GL_COLOR, 1, &texDefaultRsm[0]);
+		glClearBufferfv(GL_COLOR, 2, &texDefaultRsm[0]);
 
 		glViewport(0, 0, fboWidth, fboHeight);
 
@@ -238,32 +234,16 @@ int main( int argc, char** argv )
 				glm::mat4 modelTf = asset.sceneTf * node->mModelTf;
 				glm::mat4 modelviewTf = lightViewTf * modelTf;
 				glm::mat4 mvpTf = lightProjectionTf * lightViewTf * modelTf;
-				glm::mat3 normals2eyeTf = glm::mat3(glm::inverse(glm::transpose(modelviewTf)));
+				float lightIntensity = settings->mLights[0].mIntensity;
 
 				buildRsmProgram->setUniformMat4("mTf", modelTf);
 				buildRsmProgram->setUniformMat4("mvpTf", mvpTf);
-				buildRsmProgram->setUniformMat3("normals2eyeTf", normals2eyeTf);
+				buildRsmProgram->setUniformVal("lightIntensity", lightIntensity);
 
 				for (auto id : node->mMeshIds)
 				{
 					auto meshData = asset.model->mMeshDataCPU[id];
 					auto vao = asset.model->mVAOs[id];
-
-					if (!meshData.mMaterial.mDiffuseTexture.empty())
-					{
-						auto texture = asset.model->mTextures.at(meshData.mMaterial.mDiffuseTexture);
-						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, texture->mHandle);
-						buildRsmProgram->setUniformBVal("hasDiffuseTexture", true);
-					}
-					else
-					{
-						buildRsmProgram->setUniformBVal("hasDiffuseTexture", false);
-					}
-
-					buildRsmProgram->setUniformTexVal("diffuseTexture", 0);
-					buildRsmProgram->setUniformVec3("kDiffuse", meshData.mMaterial.mKDiffuse);
-
 					glBindVertexArray(vao);
 					glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
 				}
@@ -281,7 +261,6 @@ int main( int argc, char** argv )
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glViewport(0, 0, settings->mGeneral.mWindowWidth, settings->mGeneral.mWindowHeight);
 #pragma endregion
-
 
 #pragma region RenderPass1
 		glEnable(GL_DEPTH_TEST);
@@ -463,9 +442,7 @@ int main( int argc, char** argv )
 		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[2]);
 		glActiveTexture(GL_TEXTURE8);
 		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[3]);
-		glActiveTexture(GL_TEXTURE9);
-		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[4]);
-
+	
 #pragma region AmbientAndDirectionalPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_ALWAYS);
@@ -486,7 +463,6 @@ int main( int argc, char** argv )
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
 
-		/*
 #pragma region PointLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -505,44 +481,38 @@ int main( int argc, char** argv )
 		evalPointLightProgram->setUniformTexVal("textureD", 3);
 		evalPointLightProgram->setUniformMat4("screen2eyeTf", screen2EyeTf);
 		evalSpotLightProgram->setUniformTexVal("tex_rsm_depth", 5);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_normal", 6);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_worldPos", 7);
+		evalSpotLightProgram->setUniformTexVal("tex_rsm_intensity", 8);
 		evalSpotLightProgram->setUniformMat4("lightScreen2WorldTf", lightScreen2WorldTf);
 
-		for (auto light : settings->mLights)
-		{
-			if (light.mType == LightType::Point)
-			{
-				glm::vec4 lightPosition = viewTf * glm::vec4(light.mPosition, 1.f);
-				evalPointLightProgram->setUniformVec4("lightSource.position", lightPosition);
-				evalPointLightProgram->setUniformVal("lightSource.intensity", light.mIntensity);
-				evalPointLightProgram->setUniformVec3("lightSource.color", light.mColor);
+		//const float epsilon = 0.01f; // matches shader epsilon
+		//float scale = glm::sqrt(light.mIntensity / epsilon);
 
-				//const float epsilon = 0.01f; // matches shader epsilon
-				//float scale = glm::sqrt(light.mIntensity / epsilon);
-				glm::mat4 scaleTf = glm::scale(glm::mat4(1.f), glm::vec3(100));
-				for (auto node : pointlightModel->mScenegraph)
-				{
-					glm::mat4 modelTf = scaleTf * node->mModelTf;
-					glm::mat4 modelviewTf = viewTf * modelTf;
-					glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
-					glm::mat4 vpTf = projectionTf * viewTf;
-					evalPointLightProgram->setUniformMat4("mTf", modelTf);
-					evalPointLightProgram->setUniformMat4("vpTf", vpTf);
-					for (auto id : node->mMeshIds)
-					{
-						auto meshData = pointlightModel->mMeshDataCPU[id];
-						auto vao = pointlightModel->mVAOs[id];
-						glBindVertexArray(vao);
-						glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
-					}
-				}
+		for (auto node : pointlightModel->mScenegraph)
+		{
+			glm::mat4 scaleTf = glm::scale(glm::mat4(1.f), glm::vec3(1));
+			glm::mat4 modelTf = scaleTf;
+			glm::mat4 modelviewTf = viewTf * modelTf;
+			glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
+			glm::mat4 vpTf = projectionTf * viewTf;
+			evalPointLightProgram->setUniformMat4("mTf", modelTf);
+			evalPointLightProgram->setUniformMat4("vTf", viewTf);
+			evalPointLightProgram->setUniformMat4("vpTf", vpTf);
+			for (auto id : node->mMeshIds)
+			{
+				auto meshData = pointlightModel->mMeshDataCPU[id];
+				auto vao = pointlightModel->mVAOs[id];
+				glBindVertexArray(vao);
+				glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
 			}
 		}
+
 
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 #pragma endregion
-		*/
 
 		
 #pragma region SpotLightPass

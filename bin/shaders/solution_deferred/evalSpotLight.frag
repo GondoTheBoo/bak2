@@ -2,7 +2,6 @@
 
 layout ( location = 0 ) out vec4 fragmentColor;
 
-in vec4 RsmTexCoor;
 
 const float PI = 3.14159265359;
 const int MAX_LIGHTS = 100;
@@ -71,14 +70,11 @@ FragmentAttribs readGBuffer()
 void main()
 {	
 	FragmentAttribs attributes = readGBuffer();
-	//vec4 lightScreenPos = RsmTexCoor.xyzw / RsmTexCoor.w;
-	//vec4 rsmDepth = texelFetch(tex_rsm_depth,ivec2(lightScreenPos.xy),0);
 	
 	vec4 worldPos = eye2worldTf * attributes.position;
 	vec4 lightEyePos = lightViewProjectionTf * worldPos;
 	vec4 lightscreenPos = lightEyePos.xyzw / lightEyePos.w;
 	vec4 rsmDepth = texelFetch(tex_rsm_depth,ivec2(lightscreenPos.xy),0);
-	
 	
 	if (attributes.solidFlag == 1)
 	{
