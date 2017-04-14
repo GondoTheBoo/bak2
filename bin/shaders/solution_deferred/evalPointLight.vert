@@ -9,9 +9,11 @@ uniform mat4 lightScreen2WorldTf;
 uniform sampler2D tex_rsm_depth;
 uniform sampler2D tex_rsm_worldPos;
 uniform sampler2D tex_rsm_normal;
+uniform sampler2D tex_rsm_intensity;
 
 out vec4 eyeLightSourcePos;
 out vec3 eyeNormal;
+out float intensity;
   
 void main()
 {
@@ -19,10 +21,19 @@ void main()
 	vec4 texDepth = texelFetch(tex_rsm_depth, ivec2(sampleXY.xy), 0);
 	vec4 lightWorldPos = texelFetch(tex_rsm_worldPos, ivec2(sampleXY.xy), 0);
 	vec4 worldNormal = texelFetch(tex_rsm_normal, ivec2(sampleXY.xy),0);
+	float intensityScale = texelFetch(tex_rsm_intensity, ivec2(sampleXY.xy),0).r;
 	
-	vec4 vertexWorldPos = mTf * vec4(vertexPosition, 1.0);
+	vec4 lightScreenSpaceCoord = vec4(sampleXY.xy, texDepth.z, 1.0);
+	vec4 calcWorldPos = lightScreen2WorldTf * lightScreenSpaceCoord;
+	calcWorldPos /= calcWorldPos.w;
+	
+	vec4 scaledVertexPos = vec4(vertexPosition,1.0) * intensityScale;
+	vec4 vertexWorldPos = mTf * scaledVertexPos;
 	eyeLightSourcePos = vTf * lightWorldPos;
 	eyeNormal = normalize((vTf * worldNormal).xyz);
+	intensity = intensityScale;
+	
+
 	
 	vec4 newWorldPos = vertexWorldPos + lightWorldPos;
 	gl_Position = vpTf * newWorldPos;

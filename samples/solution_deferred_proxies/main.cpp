@@ -235,10 +235,12 @@ int main( int argc, char** argv )
 				glm::mat4 modelviewTf = lightViewTf * modelTf;
 				glm::mat4 mvpTf = lightProjectionTf * lightViewTf * modelTf;
 				float lightIntensity = settings->mLights[0].mIntensity;
-
+				glm::vec3 lightPos = settings->mLights[0].mPosition;
+				
 				buildRsmProgram->setUniformMat4("mTf", modelTf);
 				buildRsmProgram->setUniformMat4("mvpTf", mvpTf);
 				buildRsmProgram->setUniformVal("lightIntensity", lightIntensity);
+				buildRsmProgram->setUniformVec3("lightPos", lightPos);
 
 				for (auto id : node->mMeshIds)
 				{
@@ -491,8 +493,8 @@ int main( int argc, char** argv )
 
 		for (auto node : pointlightModel->mScenegraph)
 		{
-			glm::mat4 scaleTf = glm::scale(glm::mat4(1.f), glm::vec3(1));
-			glm::mat4 modelTf = scaleTf;
+			//glm::mat4 scaleTf = glm::scale(glm::mat4(1.f), glm::vec3(1));
+			glm::mat4 modelTf = glm::mat4(1.f);
 			glm::mat4 modelviewTf = viewTf * modelTf;
 			glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
 			glm::mat4 vpTf = projectionTf * viewTf;
@@ -514,7 +516,7 @@ int main( int argc, char** argv )
 		glDisable(GL_BLEND);
 #pragma endregion
 
-		
+	/*	
 #pragma region SpotLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -583,7 +585,7 @@ int main( int argc, char** argv )
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 #pragma endregion
-
+*/
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glActiveTexture(GL_TEXTURE1);

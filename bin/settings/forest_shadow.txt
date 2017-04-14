@@ -6,7 +6,7 @@
 			"near plane": 1.0,
 			"far plane": 300.0,
 			"field of view": 30.0,
-			"position": [0.0, 20.0, -20.0],
+			"position": [0.0, 1.0, 10.0],
 			"look at": [0.0, 0.0, 0.0],
 			"up direction": [0.0, 1.0, 0.0]
 		},
@@ -17,9 +17,9 @@
 		},	
 		"assets": [
 		{
-			"file": "forest\\forest.obj",
-			"scaling": [0.025, 0.025, 0.025],
-			"translation": [0.0, -6.0, 0.0],
+			"file": "CornellBox\\CornellBox-Original.obj",
+			"scaling": [1.025, 1.025, 1.025],
+			"translation": [0.0, 0.0, 0.0],
 			"rotation": [0.0, 0.0, 0.0, 1.0]
 		}
 		],
@@ -27,9 +27,9 @@
 		{
 			"type": "spot",
 			"color" : [1.0, 1.0, 1.0],
-			"intensity" : 500.0,
-			"position" : [0.0, 15.0, -15.0],
-			"direction" : [0.0, -1.0, 1.0],
+			"intensity" : 100.0,
+			"position" : [6.0, 3.0, 7.5],
+			"direction" : [-2.0, -1.0, -2.5],
 			"angle" : 30.0
 		}
 		]
