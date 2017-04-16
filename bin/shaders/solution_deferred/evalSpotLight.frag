@@ -107,8 +107,7 @@ void main()
 		float visibility = 1.0;
 		if(rsmDepth.r < lightscreenPos.z-bias)
 			visibility = 0.5;
-			
-		//fragmentColor = vec4(RsmTexCoor.z,RsmTexCoor.z,RsmTexCoor.z,1.0);
+
 		fragmentColor = vec4( clamp( color * visibility, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
 	}
 }

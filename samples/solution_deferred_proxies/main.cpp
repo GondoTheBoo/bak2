@@ -160,8 +160,8 @@ int main( int argc, char** argv )
 
 
 	//add this line and replace, if i want to render to other color attachments etc... differnet than previous setup
-	//std::vector< GLenum > fboBuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(fboBuffers.size(), fboBuffers.data());
+	std::vector< GLenum > rsmFboBuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+	glDrawBuffers(rsmFboBuffers.size(), rsmFboBuffers.data());
 
 	GLenum statusCodeRsm = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 	if (statusCodeRsm != GL_FRAMEBUFFER_COMPLETE)
@@ -480,13 +480,13 @@ int main( int argc, char** argv )
 		evalPointLightProgram->setUniformTexVal("textureA", 0);
 		evalPointLightProgram->setUniformTexVal("textureB", 1);
 		evalPointLightProgram->setUniformTexVal("textureC", 2);
-		evalPointLightProgram->setUniformTexVal("textureD", 3);
+		//evalPointLightProgram->setUniformTexVal("textureD", 3);
 		evalPointLightProgram->setUniformMat4("screen2eyeTf", screen2EyeTf);
-		evalSpotLightProgram->setUniformTexVal("tex_rsm_depth", 5);
-		evalSpotLightProgram->setUniformTexVal("tex_rsm_normal", 6);
-		evalSpotLightProgram->setUniformTexVal("tex_rsm_worldPos", 7);
-		evalSpotLightProgram->setUniformTexVal("tex_rsm_intensity", 8);
-		evalSpotLightProgram->setUniformMat4("lightScreen2WorldTf", lightScreen2WorldTf);
+		evalPointLightProgram->setUniformTexVal("tex_rsm_depth", 5);
+		//evalPointLightProgram->setUniformTexVal("tex_rsm_normal", 6);
+		//evalPointLightProgram->setUniformTexVal("tex_rsm_worldPos", 7);
+		evalPointLightProgram->setUniformTexVal("tex_rsm_intensity", 8);
+		evalPointLightProgram->setUniformMat4("lightScreen2WorldTf", lightScreen2WorldTf);
 
 		//const float epsilon = 0.01f; // matches shader epsilon
 		//float scale = glm::sqrt(light.mIntensity / epsilon);
@@ -498,7 +498,7 @@ int main( int argc, char** argv )
 			glm::mat4 modelviewTf = viewTf * modelTf;
 			glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
 			glm::mat4 vpTf = projectionTf * viewTf;
-			evalPointLightProgram->setUniformMat4("mTf", modelTf);
+			//evalPointLightProgram->setUniformMat4("mTf", modelTf);
 			evalPointLightProgram->setUniformMat4("vTf", viewTf);
 			evalPointLightProgram->setUniformMat4("vpTf", vpTf);
 			for (auto id : node->mMeshIds)
@@ -506,7 +506,10 @@ int main( int argc, char** argv )
 				auto meshData = pointlightModel->mMeshDataCPU[id];
 				auto vao = pointlightModel->mVAOs[id];
 				glBindVertexArray(vao);
-				glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
+				//4*instanceID = pixelcount --> 1024/32 = 32 only for x axis
+				//for each x axis value --> 768/32 = 24 times  
+				// --> 64*48 = 768
+				glDrawElementsInstanced(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr, 768);
 			}
 		}
 
@@ -516,7 +519,7 @@ int main( int argc, char** argv )
 		glDisable(GL_BLEND);
 #pragma endregion
 
-	/*	
+		/*
 #pragma region SpotLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);

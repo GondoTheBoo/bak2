@@ -15,7 +15,7 @@ in vec4 worldSpacePos;
 void main()
 {	
 	vec3 toLight = lightPos - worldSpacePos.xyz;
-	float lightFalloff = 1.0 / length( toLight ); lightFalloff *= lightFalloff; lightFalloff = min( 1, lightFalloff );
+	float lightFalloff = 1.0 / length( toLight ); lightFalloff *= lightFalloff; lightFalloff = min( 1, lightFalloff ); // 1/length^2
 	if (lightFalloff * lightIntensity < EPSILON)
 		lightFalloff = 0.0;
 	
