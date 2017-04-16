@@ -20,6 +20,8 @@ void main()
 		lightFalloff = 0.0;
 	
 	fragmentIntensity = vec4(lightFalloff, lightFalloff, lightFalloff, 1.0);
-	fragmentNormal = vec4(normalize(worldSpaceNormal),1.0);
+	
+	vec3 N = normalize(worldSpaceNormal);
+	fragmentNormal = vec4( 0.5*N + vec3( 0.5 ), 0.0 ); 
 	fragmentWorldCoordinate = worldSpacePos;
 }

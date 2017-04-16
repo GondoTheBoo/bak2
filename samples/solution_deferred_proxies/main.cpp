@@ -58,6 +58,8 @@ int main( int argc, char** argv )
 	std::shared_ptr< cg2::GlslProgram > evalSpotLightProgram = cg2::GlslProgram::create(evalSpotLightShaders, true);
 	std::vector< cg2::ShaderInfo > buildRsmShaders = { cg2::ShaderInfo(cg2::ShaderType::VERTEX_SHADER, cg2::loadShaderSource("shaders\\solution_deferred\\buildRsm.vert")), cg2::ShaderInfo(cg2::ShaderType::FRAGMENT_SHADER, cg2::loadShaderSource("shaders\\solution_deferred\\buildRsm.frag")) };
 	std::shared_ptr< cg2::GlslProgram > buildRsmProgram = cg2::GlslProgram::create(buildRsmShaders, true);
+	std::vector< cg2::ShaderInfo > showRsmShaders = { cg2::ShaderInfo(cg2::ShaderType::VERTEX_SHADER, cg2::loadShaderSource("shaders\\solution_deferred\\showRsm.vert")), cg2::ShaderInfo(cg2::ShaderType::FRAGMENT_SHADER, cg2::loadShaderSource("shaders\\solution_deferred\\showRsm.frag")) };
+	std::shared_ptr< cg2::GlslProgram > showRsmProgram = cg2::GlslProgram::create(showRsmShaders, true);
 #pragma endregion
 
 #pragma region ImportAssets
@@ -241,6 +243,8 @@ int main( int argc, char** argv )
 				buildRsmProgram->setUniformMat4("mvpTf", mvpTf);
 				buildRsmProgram->setUniformVal("lightIntensity", lightIntensity);
 				buildRsmProgram->setUniformVec3("lightPos", lightPos);
+				glm::mat3 normals2WorldTf = glm::mat3(glm::inverse(glm::transpose(modelTf)));
+				buildRsmProgram->setUniformMat3("normals2WorldTf", normals2WorldTf);
 
 				for (auto id : node->mMeshIds)
 				{
@@ -252,17 +256,10 @@ int main( int argc, char** argv )
 			}
 		}
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, 0);
-
-
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glViewport(0, 0, settings->mGeneral.mWindowWidth, settings->mGeneral.mWindowHeight);
 #pragma endregion
+
 
 #pragma region RenderPass1
 		glEnable(GL_DEPTH_TEST);
@@ -444,7 +441,27 @@ int main( int argc, char** argv )
 		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[2]);
 		glActiveTexture(GL_TEXTURE8);
 		glBindTexture(GL_TEXTURE_2D, handleToRsmGBufferTextures[3]);
-	
+
+		/*
+#pragma region RenderRsmData
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_ALWAYS);
+		glDepthMask(GL_TRUE);
+
+		cg2::GlslProgram::setActiveProgram(showRsmProgram);
+		showRsmProgram->setUniformTexVal("tex_rsm_depth", 5);
+		showRsmProgram->setUniformTexVal("tex_rsm_normal", 6);
+		showRsmProgram->setUniformTexVal("tex_rsm_worldPos", 7);
+		showRsmProgram->setUniformTexVal("tex_rsm_intensity", 8);
+
+		glBindVertexArray(fullscreenQuad);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glBindVertexArray(0);
+
+		glDisable(GL_DEPTH_TEST);
+#pragma endregion
+*/
+
 #pragma region AmbientAndDirectionalPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_ALWAYS);
@@ -480,25 +497,19 @@ int main( int argc, char** argv )
 		evalPointLightProgram->setUniformTexVal("textureA", 0);
 		evalPointLightProgram->setUniformTexVal("textureB", 1);
 		evalPointLightProgram->setUniformTexVal("textureC", 2);
-		//evalPointLightProgram->setUniformTexVal("textureD", 3);
 		evalPointLightProgram->setUniformMat4("screen2eyeTf", screen2EyeTf);
 		evalPointLightProgram->setUniformTexVal("tex_rsm_depth", 5);
-		//evalPointLightProgram->setUniformTexVal("tex_rsm_normal", 6);
+		evalPointLightProgram->setUniformTexVal("tex_rsm_normal", 6);
 		//evalPointLightProgram->setUniformTexVal("tex_rsm_worldPos", 7);
 		evalPointLightProgram->setUniformTexVal("tex_rsm_intensity", 8);
 		evalPointLightProgram->setUniformMat4("lightScreen2WorldTf", lightScreen2WorldTf);
-
-		//const float epsilon = 0.01f; // matches shader epsilon
-		//float scale = glm::sqrt(light.mIntensity / epsilon);
+		
+		glm::mat3 normals2EyeTf = glm::mat3(glm::inverse(glm::transpose(viewTf)));
+		evalPointLightProgram->setUniformMat3("normals2EyeTf", normals2EyeTf);
 
 		for (auto node : pointlightModel->mScenegraph)
 		{
-			//glm::mat4 scaleTf = glm::scale(glm::mat4(1.f), glm::vec3(1));
-			glm::mat4 modelTf = glm::mat4(1.f);
-			glm::mat4 modelviewTf = viewTf * modelTf;
-			glm::mat4 mvpTf = projectionTf * viewTf * modelTf;
 			glm::mat4 vpTf = projectionTf * viewTf;
-			//evalPointLightProgram->setUniformMat4("mTf", modelTf);
 			evalPointLightProgram->setUniformMat4("vTf", viewTf);
 			evalPointLightProgram->setUniformMat4("vpTf", vpTf);
 			for (auto id : node->mMeshIds)

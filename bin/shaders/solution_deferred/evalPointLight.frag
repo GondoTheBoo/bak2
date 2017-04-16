@@ -12,6 +12,7 @@ uniform mat4 screen2eyeTf;
 const float EPSILON = 0.01;
 
 in vec4 lightEyePos;
+in vec3 lightDirectionEye;
 in float lightIntensity;
 
 struct FragmentAttribs
@@ -61,5 +62,5 @@ void main()
 
 	vec3 color = lightIntensity * lightFalloff * dotNL * attributes.kD;
 	fragmentColor = vec4( clamp( color, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
-	//fragmentColor = vec4(1.0,1.0,1.0,1.0);
+	//fragmentColor = vec4(normalize(lightDirectionEye),1.0);
 }
