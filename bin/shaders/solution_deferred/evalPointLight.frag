@@ -13,7 +13,7 @@ const float EPSILON = 0.01;
 
 in vec4 lightEyePos;
 in vec3 lightDirectionEye;
-in float lightIntensity;
+in vec3 lightFlux;
 
 struct FragmentAttribs
 {
@@ -46,21 +46,29 @@ FragmentAttribs readGBuffer()
 void main()
 {	
 	FragmentAttribs attributes = readGBuffer();
-
-	vec3 N = normalize( attributes.normal.xyz );
-	vec3 V = normalize( -attributes.position.xyz );
-
-	vec3 toLight = lightEyePos.xyz - attributes.position.xyz;
-	float lightFalloff = 1.0 / length( toLight ); lightFalloff *= lightFalloff;	lightFalloff = min( 1, lightFalloff );
 	
+	vec3 N = normalize( attributes.normal.xyz );
+	
+	vec3 np = normalize(lightDirectionEye);
+	vec3 angle = (attributes.position.xyz - lightEyePos.xyz) / length(attributes.position.xyz - lightEyePos.xyz);
+	vec3 Ip = lightFlux * max(0, dot(np , angle));
+	
+	vec3 toLight = lightEyePos.xyz - attributes.position.xyz;
+	
+	vec3 Ep = Ip * max(0, dot(N,toLight)) / pow(length(lightEyePos.xyz - attributes.position.xyz),3); 
+	
+	/*
+	vec3 V = normalize( -attributes.position.xyz );
+	float lightFalloff = 1.0 / length( toLight ); lightFalloff *= lightFalloff;	lightFalloff = min( 1, lightFalloff );
 	vec3 L = normalize( toLight );
 
 	if (lightFalloff * lightIntensity < EPSILON)
 		discard;
 
 	float dotNL = max( dot( N, L ), 0.0 );
-
 	vec3 color = lightIntensity * lightFalloff * dotNL * attributes.kD;
+	*/
+	vec3 color = Ep * attributes.kD;
 	fragmentColor = vec4( clamp( color, vec3( 0.0 ), vec3( 1.0 ) ), 1.0 );
 	//fragmentColor = vec4(normalize(lightDirectionEye),1.0);
 }

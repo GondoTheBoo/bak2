@@ -250,6 +250,22 @@ int main( int argc, char** argv )
 				{
 					auto meshData = asset.model->mMeshDataCPU[id];
 					auto vao = asset.model->mVAOs[id];
+
+					if (!meshData.mMaterial.mDiffuseTexture.empty())
+					{
+						auto texture = asset.model->mTextures.at(meshData.mMaterial.mDiffuseTexture);
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, texture->mHandle);
+						buildRsmProgram->setUniformBVal("hasDiffuseTexture", true);
+					}
+					else
+					{
+						buildRsmProgram->setUniformBVal("hasDiffuseTexture", false);
+					}
+
+					buildRsmProgram->setUniformTexVal("diffuseTexture", 0);
+					buildRsmProgram->setUniformVec3("kDiffuse", meshData.mMaterial.mKDiffuse);
+
 					glBindVertexArray(vao);
 					glDrawElements(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr);
 				}
@@ -416,7 +432,6 @@ int main( int argc, char** argv )
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
 
-
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glViewport(0, 0, settings->mGeneral.mWindowWidth, settings->mGeneral.mWindowHeight);
 		
@@ -461,7 +476,7 @@ int main( int argc, char** argv )
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
 */
-
+		
 #pragma region AmbientAndDirectionalPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_ALWAYS);
@@ -517,10 +532,11 @@ int main( int argc, char** argv )
 				auto meshData = pointlightModel->mMeshDataCPU[id];
 				auto vao = pointlightModel->mVAOs[id];
 				glBindVertexArray(vao);
-				//4*instanceID = pixelcount --> 1024/32 = 32 only for x axis
+				//4*instanceID = pixelcount --> 1024/32 = 32 only for x axis  || 1024/16 = 64 times for x axis, for each x axis value  768/16 = 48 times
 				//for each x axis value --> 768/32 = 24 times  
 				// --> 64*48 = 768
-				glDrawElementsInstanced(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr, 768);
+				// --> 128*96 = 12288
+				glDrawElementsInstanced(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr, 12288);
 			}
 		}
 
@@ -530,7 +546,6 @@ int main( int argc, char** argv )
 		glDisable(GL_BLEND);
 #pragma endregion
 
-		/*
 #pragma region SpotLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -599,7 +614,7 @@ int main( int argc, char** argv )
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 #pragma endregion
-*/
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glActiveTexture(GL_TEXTURE1);
