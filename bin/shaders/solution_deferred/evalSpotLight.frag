@@ -100,8 +100,8 @@ void main()
 		float phongTerm = pow( max( dot( R, V ), 0.0 ), attributes.shininess );
 	
 		vec3 color = lightSource.intensity * lightSource.color * lightFalloff * angularCutoff * dotNL * attributes.kD;
-		if (dotNL > 0)
-			color += lightSource.intensity * lightSource.color * lightFalloff * angularCutoff * phongTerm * attributes.kS;
+		//if (dotNL > 0)
+		//	color += lightSource.intensity * lightSource.color * lightFalloff * angularCutoff * phongTerm * attributes.kS;
 			
 		float bias = 0.0005;
 		float visibility = 1.0;

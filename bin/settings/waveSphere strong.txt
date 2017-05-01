@@ -6,8 +6,8 @@
 			"near plane": 0.5,
 			"far plane": 300.0,
 			"field of view": 30.0,
-			"position": [0.0, 0.0, 3.0],
-			"look at": [-1.0, -0.5, 0.0],
+			"position": [0.0, 1.0, 4.0],
+			"look at": [-0.5, 1.0, 0.0],
 			"up direction": [0.0, 1.0, 0.0]
 		},
 		"environment":
@@ -17,19 +17,19 @@
 		},	
 		"assets": [
 		{
-			"file": "CornellBox\\CornellBox-Original.obj",
+			"file": "CornellBox\\CornellBox-Water.obj",
 			"scaling": [1.0, 1.0, 1.0],
-			"translation": [0.0, -1.0, 0.0],
-			"rotation": [0.0, 0.0, 0.0, 1.0]
+			"translation": [0.0, 0.0, 0.0],
+			"rotation": [0.0, 0.0, 0.0, 0.0]
 		}
 		],
 		"lights": [
 		{
 			"type": "spot",
 			"color" : [1.0, 1.0, 1.0],
-			"intensity" : 30.0,
-			"position" : [1.5, 1.0, 3.0],
-			"direction" : [-1.5, -1.5, -3],
+			"intensity" : 20.0,
+			"position" : [2.5, 2.0, 3.0],
+			"direction" : [-3, -1.0, -3],
 			"angle" : 30.0
 		}
 		]

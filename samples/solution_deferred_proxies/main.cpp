@@ -371,6 +371,8 @@ int main( int argc, char** argv )
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
+
+		/*
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		buildGBufferProgram->setUniformIVal("solidFlag", 1);
@@ -426,9 +428,8 @@ int main( int argc, char** argv )
 				}
 			}
 		}
-
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
+		*/
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
 
@@ -475,7 +476,7 @@ int main( int argc, char** argv )
 
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
-*/
+		*/
 		
 #pragma region AmbientAndDirectionalPass
 		glEnable(GL_DEPTH_TEST);
@@ -496,7 +497,7 @@ int main( int argc, char** argv )
 
 		glDisable(GL_DEPTH_TEST);
 #pragma endregion
-
+		
 #pragma region PointLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -507,6 +508,7 @@ int main( int argc, char** argv )
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
+		
 
 		cg2::GlslProgram::setActiveProgram(evalPointLightProgram);
 		evalPointLightProgram->setUniformTexVal("textureA", 0);
@@ -532,11 +534,17 @@ int main( int argc, char** argv )
 				auto meshData = pointlightModel->mMeshDataCPU[id];
 				auto vao = pointlightModel->mVAOs[id];
 				glBindVertexArray(vao);
-				//4*instanceID = pixelcount --> 1024/32 = 32 only for x axis  || 1024/16 = 64 times for x axis, for each x axis value  768/16 = 48 times
-				//for each x axis value --> 768/32 = 24 times  
-				// --> 64*48 = 768
-				// --> 128*96 = 12288
-				glDrawElementsInstanced(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr, 12288);
+				// every 64 line and row = 16 lines and 12 rows --> 16*12 = 192
+				//glDrawElementsInstanced(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr, 192);
+
+				// every 32 line and row = 32 lines and 24 rows --> 768
+				glDrawElementsInstanced(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr, 768);
+
+				// every 16 line and row = 64 lines and 48 rows --> 3072
+				//glDrawElementsInstanced(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr, 3072);
+
+				// every 8 line and row = 128 lines and 96 rows --> 12288
+				//glDrawElementsInstanced(GL_TRIANGLES, meshData.mIndexCount, GL_UNSIGNED_INT, nullptr, 12288);
 			}
 		}
 
@@ -544,8 +552,10 @@ int main( int argc, char** argv )
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
-#pragma endregion
 
+#pragma endregion
+		
+		
 #pragma region SpotLightPass
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
@@ -613,6 +623,8 @@ int main( int argc, char** argv )
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
+		
+		
 #pragma endregion
 
 		glActiveTexture(GL_TEXTURE0);

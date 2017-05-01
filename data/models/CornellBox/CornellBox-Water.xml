@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+
+	Automatically converted from Wavefront OBJ
+
+-->
+
+<scene version="0.5.0">
+	<integrator type="irrcache">
+		<integrator type="path">
+			<integer name="maxDepth" value="3"/>
+		</integrator>
+	</integrator>
+
+	<bsdf type="diffuse" id="leftSphere_material">
+		<rgb name="reflectance" value="0.000773994 0.000773994 0.000773994"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="rightSphere_material">
+		<rgb name="reflectance" value="0.000773994 0.000773994 0.000773994"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="floor_material">
+		<rgb name="reflectance" value="0.484419 0.462361 0.420033"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="ceiling_material">
+		<rgb name="reflectance" value="0.484419 0.462361 0.420033"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="backWall_material">
+		<rgb name="reflectance" value="0.484419 0.462361 0.420033"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="rightWall_material">
+		<rgb name="reflectance" value="0.0222271 0.0159284 0.152583"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="leftWall_material">
+		<rgb name="reflectance" value="0.354692 0.00542287 0.00393594"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="light_material">
+		<rgb name="reflectance" value="0.570482 0.570482 0.570482"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="water_material">
+		<rgb name="reflectance" value="0.000773994 0.000773994 0.000773994"/>
+	</bsdf>
+
+	<shape type="serialized" id="leftSphere_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="0"/>
+
+		<ref name="bsdf" id="ceiling_material"/>
+	</shape>
+
+	<shape type="serialized" id="rightSphere_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="1"/>
+
+		<ref name="bsdf" id="ceiling_material"/>
+	</shape>
+
+	<shape type="serialized" id="floor_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="2"/>
+
+		<ref name="bsdf" id="floor_material"/>
+	</shape>
+
+	<shape type="serialized" id="ceiling_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="3"/>
+
+		<ref name="bsdf" id="ceiling_material"/>
+	</shape>
+
+	<shape type="serialized" id="backWall_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="4"/>
+
+		<ref name="bsdf" id="backWall_material"/>
+	</shape>
+
+	<shape type="serialized" id="rightWall_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="5"/>
+
+		<ref name="bsdf" id="rightWall_material"/>
+	</shape>
+
+	<shape type="serialized" id="leftWall_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="6"/>
+
+		<ref name="bsdf" id="leftWall_material"/>
+	</shape>
+
+	<shape type="serialized" id="light_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="7"/>
+
+		<ref name="bsdf" id="light_material"/>
+	</shape>
+
+	<shape type="serialized" id="water_mesh">
+		<string name="filename" value="CornellBox-Water.serialized"/>
+		<integer name="shapeIndex" value="8"/>
+
+		<ref name="bsdf" id="ceiling_material"/>
+	</shape>
+
+	<sensor type="perspective">
+		<float name="farClip" value="12.5933"/>
+		<float name="focusDistance" value="3.4583"/>
+		<float name="fov" value="40"/>
+		<string name="fovAxis" value="x"/>
+		<float name="nearClip" value="0.024433"/>
+		<transform name="toWorld">
+
+			<lookat target="-0.124035, 1, 3.00772" origin="0, 1, 4" up="-0.00332643, 0.999994, 0.000415804"/>
+		</transform>
+
+		<sampler type="independent"/>
+
+		<film type="hdrfilm">
+			<integer name="height" value="768"/>
+			<integer name="width" value="1024"/>
+
+			<rfilter type="gaussian"/>
+		</film>
+	</sensor>
+
+	<emitter type="spot">
+		<transform name="toWorld">
+			<!-- Orient the light so that points from (1, 1, 1) towards (1, 2, 1) -->
+
+			<lookat target="-0.5, 1.0, 0.0" origin="2.5, 2.0, 3.0"/>
+		</transform>
+		<spectrum name="intensity" value="100"/>
+		<float name="curoffAngle" value="50"/>
+	</emitter>
+</scene>

@@ -6,7 +6,7 @@
 			"near plane": 0.5,
 			"far plane": 300.0,
 			"field of view": 30.0,
-			"position": [0.0, 0.0, 3.0],
+			"position": [0.0, 0.0, 6.0],
 			"look at": [-1.0, -0.5, 0.0],
 			"up direction": [0.0, 1.0, 0.0]
 		},

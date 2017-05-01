@@ -1742,7 +1742,7 @@ vt 0.9706 -0.0000 0.0000
 # 628 texture coords
 
 g leftSphere
-usemtl leftSphere
+usemtl ceiling
 s 1
 f 1/1/1 2/2/2 3/3/3 
 f 1/4/1 3/3/3 4/5/4 
@@ -4565,7 +4565,7 @@ vt 0.9706 -0.0000 0.0000
 # 628 texture coords
 
 g rightSphere
-usemtl rightSphere
+usemtl ceiling
 s 1
 f 547/629/547 548/630/548 549/631/549 
 f 547/632/547 549/631/549 550/633/550 
@@ -10789,7 +10789,7 @@ vn 0.0000 0.0000 1.0000
 # 2432 vertex normals
 
 g water
-usemtl water
+usemtl ceiling
 s 1
 f 1117//1102 1118//1103 1119//1104 
 f 1117//1102 1119//1104 1120//1105 
